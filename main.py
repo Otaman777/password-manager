@@ -1,11 +1,15 @@
+import json
 import tkinter
 import random
 import pyperclip
 from tkinter import messagebox
 
+
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
-    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+               'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+               'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
@@ -25,20 +29,37 @@ def generate_password():
     password_entry.insert(0, password)
     pyperclip.copy(password)
 
+
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save():
     website = website_entry.get()
     em_us = em_us_entry.get()
     password = password_entry.get()
+    new_data = {
+        website: {
+            "email": em_us,
+            "password": password
+        }
+    }
     if website == "" or em_us == "" or password == "":
         tkinter.messagebox.showerror(title="Error", message="You shouldn't leave any empty field.")
     else:
-        is_ok = tkinter.messagebox.askokcancel(title=website, message=f"These are the details entered: \n{em_us} \nPassword: {password} \nIs it ok to save?")
-        if is_ok:
-            with open("passwords.txt", mode="a") as pw_file:
-                pw_file.write(f"{website} | {em_us} | {password}\n")
-                website_entry.delete(0, 'end')
-                password_entry.delete(0, 'end')
+        try:
+            with open("passwords.json", mode="r") as pw_file:
+                # Read old data
+                data = json.load(pw_file)
+        except FileNotFoundError:
+            with open("passwords.json", mode="w") as pw_file:
+                json.dump(new_data, pw_file, indent=4)
+        else:
+            with open("passwords.json", mode="w") as pw_file:
+                # Updating old data with new data
+                data.update(new_data)
+                # Saving updated data
+                json.dump(data, pw_file, indent=4)
+        finally:
+            website_entry.delete(0, 'end')
+            password_entry.delete(0, 'end')
 
 
 # ---------------------------- UI SETUP ------------------------------- #
