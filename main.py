@@ -62,6 +62,26 @@ def save():
             password_entry.delete(0, 'end')
 
 
+# ---------------------------- SEARCH USERNAME AND PASSWORD ------------------------------- #
+
+def find_password():
+    website = website_entry.get()
+    try:
+        with open("passwords.json", mode="r") as pw_file:
+            json_passwords = json.load(pw_file)
+    except FileNotFoundError:
+        tkinter.messagebox.showwarning(title=website, message="No Data file Found.")
+    else:
+        try:
+            result = json_passwords[website]
+            em_us = result["email"]
+            password = result["password"]
+        except KeyError:
+            tkinter.messagebox.showwarning(title="Error", message=f"No details for the {website} exists.")
+        else:
+            tkinter.messagebox.showinfo(title=website, message=f"Email/Username: {em_us} \nPassword: {password}")
+
+
 # ---------------------------- UI SETUP ------------------------------- #
 window = tkinter.Tk()
 
@@ -82,7 +102,7 @@ em_us_label.grid(row=2, column=0)
 password_label.grid(row=3, column=0)
 
 # Entries
-website_entry = tkinter.Entry(width=52)
+website_entry = tkinter.Entry(width=33)
 website_entry.focus()
 em_us_entry = tkinter.Entry(width=52)
 em_us_entry.insert(0, "user@gmail.com")
@@ -92,8 +112,10 @@ em_us_entry.grid(row=2, column=1, columnspan=2, sticky="W")
 password_entry.grid(row=3, column=1, sticky="W")
 
 # Buttons
+search_button = tkinter.Button(text="Search", width=14, command=find_password)
 generate_pw_button = tkinter.Button(text="Generate Password", command=generate_password)
 add_pw_button = tkinter.Button(text="Add", width=44, command=save)
+search_button.grid(row=1, column=2, sticky="W")
 generate_pw_button.grid(row=3, column=2, sticky="W")
 add_pw_button.grid(row=4, column=1, columnspan=2, sticky="W")
 
